@@ -23,16 +23,8 @@ app.use(async (ctx, next) => {
 // Application error handler, can write to a file, to a DB, etc.
 app.on('error', (err, ctx) => {
   if (ctx.status >= 400) {
-    console.log('error status', ctx.status);
+    console.error(err);
   }
-});
-
-// logger
-
-app.use(async (ctx, next) => {
-  await next();
-  const rt = ctx.response.get('X-Response-Time');
-  console.log(`${ctx.method} ${ctx.url} - ${rt}`);
 });
 
 // x-response-time
@@ -41,6 +33,13 @@ app.use(async (ctx, next) => {
   await next();
   const ms = Date.now() - start;
   ctx.set('X-Response-Time', `${ms}ms`);
+});
+
+// logger
+app.use(async (ctx, next) => {
+  await next();
+  const time = ctx.response.get('X-Response-Time');
+  console.log(`${ctx.method} ${ctx.url} - ${time}`);
 });
 
 app.use(logger());
